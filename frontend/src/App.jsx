@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import LoginPage from './pages/LoginPage';
 
 // Placeholder components (will be implemented in next steps)
-const LoginPage = () => <div className="p-8">Login Page - Coming Soon</div>;
 const Dashboard = () => <div className="p-8">Dashboard - Coming Soon</div>;
 
 function App() {
