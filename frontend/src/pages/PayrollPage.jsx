@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Layout from '../components/Layout';
+import Card from '../components/ui/Card';
+import { DollarSign } from 'lucide-react';
 
 const PayrollPage = () => {
   const [payrollRecords, setPayrollRecords] = useState([]);
@@ -37,24 +38,27 @@ const PayrollPage = () => {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="text-center py-8">Loading...</div>
-      </Layout>
+      <div className="flex justify-center items-center h-64">
+        <div className="text-gray-600">Loading payroll records...</div>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">My Payroll</h1>
+    <div className="space-y-6">
+      <div className="flex items-center space-x-3">
+        <DollarSign className="w-8 h-8 text-purple-600" />
+        <h1 className="text-3xl font-bold text-gray-900">My Payroll</h1>
+      </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
+      {error && (
+        <div className="alert alert-error">
+          {error}
+        </div>
+      )}
 
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+      <Card title="Payroll History" subtitle="View your salary records">
+        <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -74,10 +78,10 @@ const PayrollPage = () => {
               ) : (
                 payrollRecords.map((record) => (
                   <tr key={record.id}>
-                    <td className="px-6 py-4 whitespace-nowrap font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
                       {getMonthName(record.month)} {record.year}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-gray-900">
                       {formatCurrency(record.base_salary)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-red-600">
@@ -92,8 +96,8 @@ const PayrollPage = () => {
             </tbody>
           </table>
         </div>
-      </div>
-    </Layout>
+      </Card>
+    </div>
   );
 };
 

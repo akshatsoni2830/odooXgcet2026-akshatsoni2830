@@ -1,7 +1,10 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import Layout from '../components/Layout';
 import { AuthContext } from '../context/AuthContext';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import FormInput from '../components/ui/FormInput';
+import { User, Edit, Save, X } from 'lucide-react';
 
 const EmployeeProfile = () => {
   const { user } = useContext(AuthContext);
@@ -63,169 +66,149 @@ const EmployeeProfile = () => {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="text-center py-8">Loading...</div>
-      </Layout>
+      <div className="flex justify-center items-center h-64">
+        <div className="text-gray-600">Loading profile...</div>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">My Profile</h1>
-
-        {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
-            {message}
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
-
-        <div className="bg-white rounded-lg shadow p-6">
-          {!isEditing ? (
-            <div className="space-y-4">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">First Name</label>
-                      <p className="mt-1 text-lg">{profile?.first_name || '-'}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">Last Name</label>
-                      <p className="mt-1 text-lg">{profile?.last_name || '-'}</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-500">Email</label>
-                    <p className="mt-1 text-lg">{profile?.email}</p>
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-500">Phone</label>
-                    <p className="mt-1 text-lg">{profile?.phone || '-'}</p>
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">Department</label>
-                      <p className="mt-1 text-lg">{profile?.department || '-'}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">Position</label>
-                      <p className="mt-1 text-lg">{profile?.position || '-'}</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-500">Hire Date</label>
-                    <p className="mt-1 text-lg">
-                      {profile?.hire_date ? new Date(profile.hire_date).toLocaleDateString() : '-'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setIsEditing(true)}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 mt-6"
-              >
-                Edit Profile
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="first_name"
-                    value={formData.first_name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="last_name"
-                    value={formData.last_name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Department
-                </label>
-                <input
-                  type="text"
-                  name="department"
-                  value={formData.department}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div className="bg-gray-50 p-4 rounded">
-                <p className="text-sm text-gray-600">
-                  <strong>Note:</strong> Email, position, and hire date can only be updated by an administrator.
-                </p>
-              </div>
-
-              <div className="flex space-x-4">
-                <button
-                  type="submit"
-                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-                >
-                  Save Changes
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEditing(false);
-                    setError('');
-                  }}
-                  className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
+    <div className="space-y-6">
+      <div className="flex items-center space-x-3">
+        <User className="w-8 h-8 text-purple-600" />
+        <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
       </div>
-    </Layout>
+
+      {message && (
+        <div className="alert alert-success">
+          {message}
+        </div>
+      )}
+
+      {error && (
+        <div className="alert alert-error">
+          {error}
+        </div>
+      )}
+
+      <Card title="Personal Information" subtitle={isEditing ? 'Update your profile details' : 'View your profile information'}>
+        {!isEditing ? (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-500 mb-1">First Name</label>
+                <p className="text-lg text-gray-900">{profile?.first_name || '-'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-500 mb-1">Last Name</label>
+                <p className="text-lg text-gray-900">{profile?.last_name || '-'}</p>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-500 mb-1">Email</label>
+              <p className="text-lg text-gray-900">{profile?.email}</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-500 mb-1">Phone</label>
+              <p className="text-lg text-gray-900">{profile?.phone || '-'}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-500 mb-1">Department</label>
+                <p className="text-lg text-gray-900">{profile?.department || '-'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-500 mb-1">Position</label>
+                <p className="text-lg text-gray-900">{profile?.position || '-'}</p>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-500 mb-1">Hire Date</label>
+              <p className="text-lg text-gray-900">
+                {profile?.hire_date ? new Date(profile.hire_date).toLocaleDateString() : '-'}
+              </p>
+            </div>
+
+            <Button
+              onClick={() => setIsEditing(true)}
+              variant="primary"
+              className="w-full"
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              Edit Profile
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormInput
+                label="First Name"
+                type="text"
+                name="first_name"
+                value={formData.first_name}
+                onChange={handleChange}
+                required
+              />
+              <FormInput
+                label="Last Name"
+                type="text"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <FormInput
+              label="Phone"
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+            />
+
+            <FormInput
+              label="Department"
+              type="text"
+              name="department"
+              value={formData.department}
+              onChange={handleChange}
+            />
+
+            <div className="alert alert-info">
+              <strong>Note:</strong> Email, position, and hire date can only be updated by an administrator.
+            </div>
+
+            <div className="flex space-x-4">
+              <Button
+                type="submit"
+                variant="primary"
+                className="flex-1"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save Changes
+              </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  setIsEditing(false);
+                  setError('');
+                }}
+                variant="outline"
+                className="flex-1"
+              >
+                <X className="w-4 h-4 mr-2" />
+                Cancel
+              </Button>
+            </div>
+          </form>
+        )}
+      </Card>
+    </div>
   );
 };
 

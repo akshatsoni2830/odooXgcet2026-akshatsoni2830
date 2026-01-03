@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Layout from '../components/Layout';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import { DollarSign, Plus, Edit, Trash2 } from 'lucide-react';
 
 const AdminPayrollPage = () => {
   const [payrollRecords, setPayrollRecords] = useState([]);
@@ -53,32 +55,35 @@ const AdminPayrollPage = () => {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="text-center py-8">Loading...</div>
-      </Layout>
+      <div className="flex justify-center items-center h-64">
+        <div className="text-gray-600">Loading payroll records...</div>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">Payroll Management</h1>
-          <Link
-            to="/admin/payroll/new"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Add Payroll Entry
-          </Link>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <DollarSign className="w-8 h-8 text-purple-600" />
+          <h1 className="text-3xl font-bold text-gray-900">Payroll Management</h1>
         </div>
+        <Link to="/admin/payroll/new">
+          <Button variant="primary">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Payroll Entry
+          </Button>
+        </Link>
+      </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
+      {error && (
+        <div className="alert alert-error">
+          {error}
+        </div>
+      )}
 
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+      <Card title="All Payroll Records" subtitle="Manage employee salary records">
+        <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -102,14 +107,14 @@ const AdminPayrollPage = () => {
                   <tr key={record.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="font-medium">{record.first_name} {record.last_name}</div>
+                        <div className="font-medium text-gray-900">{record.first_name} {record.last_name}</div>
                         <div className="text-sm text-gray-500">{record.email}</div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-900">
                       {getMonthName(record.month)} {record.year}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-gray-900">
                       {formatCurrency(record.base_salary)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-red-600">
@@ -119,18 +124,25 @@ const AdminPayrollPage = () => {
                       {formatCurrency(record.net_salary)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => navigate(`/admin/payroll/edit/${record.id}`)}
-                        className="text-blue-600 hover:text-blue-900 mr-4"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(record.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Delete
-                      </button>
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          onClick={() => navigate(`/admin/payroll/edit/${record.id}`)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
+                        </Button>
+                        <Button
+                          onClick={() => handleDelete(record.id)}
+                          variant="outline"
+                          size="sm"
+                          className="text-red-600 border-red-300 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Delete
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -138,8 +150,8 @@ const AdminPayrollPage = () => {
             </tbody>
           </table>
         </div>
-      </div>
-    </Layout>
+      </Card>
+    </div>
   );
 };
 
