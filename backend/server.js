@@ -11,7 +11,10 @@ app.use(express.json());
 
 // Routes
 const authRoutes = require('./routes/auth');
+const employeeRoutes = require('./routes/employees');
+
 app.use('/api/auth', authRoutes);
+app.use('/api/employees', employeeRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
