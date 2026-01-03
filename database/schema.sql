@@ -56,10 +56,12 @@ CREATE TABLE attendance (
 CREATE TABLE leave_requests (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    leave_type VARCHAR(20) NOT NULL CHECK (leave_type IN ('PAID', 'SICK', 'UNPAID')),
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     reason TEXT,
     status leave_status NOT NULL DEFAULT 'PENDING',
+    admin_comments TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
