@@ -3,6 +3,8 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
+import EmployeeList from './pages/EmployeeList';
+import EmployeeForm from './pages/EmployeeForm';
 
 // Placeholder components (will be implemented in next steps)
 const ComingSoon = ({ title }) => (
@@ -69,7 +71,23 @@ function App() {
             path="/employees"
             element={
               <ProtectedRoute adminOnly>
-                <ComingSoon title="Employees" />
+                <EmployeeList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/employees/new"
+            element={
+              <ProtectedRoute adminOnly>
+                <EmployeeForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/employees/edit/:id"
+            element={
+              <ProtectedRoute adminOnly>
+                <EmployeeForm />
               </ProtectedRoute>
             }
           />
