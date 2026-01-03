@@ -9,15 +9,25 @@ const router = express.Router();
 router.post('/request', authMiddleware, async (req, res) => {
   try {
     const { id: user_id } = req.user;
-    const { start_date, end_date, reason } = req.body;
+    const { leave_type, start_date, end_date, reason } = req.body;
 
     // Validate required fields
-    if (!start_date || !end_date) {
+    if (!leave_type || !start_date || !end_date) {
       return res.status(400).json({
         error: {
-          message: 'Start date and end date are required',
+          message: 'Leave type, start date and end date are required',
           code: 'MISSING_REQUIRED_FIELDS',
-          details: { required: ['start_date', 'end_date'] }
+          details: { required: ['leave_type', 'start_date', 'end_date'] }
+        }
+      });
+    }
+
+    // Validate leave type
+    if (!['PAID', 'SICK', 'UNPAID'].includes(leave_type)) {
+      return res.status(400).json({
+        error: {
+          message: 'Leave type must be PAID, SICK, or UNPAID',
+          code: 'INVALID_LEAVE_TYPE'
         }
       });
     }
@@ -34,10 +44,10 @@ router.post('/request', authMiddleware, async (req, res) => {
 
     // Create leave request with PENDING status
     const result = await pool.query(
-      `INSERT INTO leave_requests (user_id, start_date, end_date, reason, status, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, 'PENDING', NOW(), NOW())
-       RETURNING id, user_id, start_date, end_date, reason, status, created_at, updated_at`,
-      [user_id, start_date, end_date, reason || null]
+      `INSERT INTO leave_requests (user_id, leave_type, start_date, end_date, reason, status, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, 'PENDING', NOW(), NOW())
+       RETURNING id, user_id, leave_type, start_date, end_date, reason, status, created_at, updated_at`,
+      [user_id, leave_type, start_date, end_date, reason || null]
     );
 
     res.status(201).json(result.rows[0]);
@@ -59,7 +69,7 @@ router.get('/my-requests', authMiddleware, async (req, res) => {
     const { id: user_id } = req.user;
 
     const result = await pool.query(
-      `SELECT id, user_id, start_date, end_date, reason, status, created_at, updated_at
+      `SELECT id, user_id, leave_type, start_date, end_date, reason, status, admin_comments, created_at, updated_at
        FROM leave_requests
        WHERE user_id = $1
        ORDER BY created_at DESC`,
@@ -84,8 +94,8 @@ router.get('/pending', authMiddleware, roleMiddleware(['ADMIN']), async (req, re
   try {
     const result = await pool.query(
       `SELECT 
-        lr.id, lr.user_id, lr.start_date, lr.end_date, lr.reason, lr.status, 
-        lr.created_at, lr.updated_at,
+        lr.id, lr.user_id, lr.leave_type, lr.start_date, lr.end_date, lr.reason, lr.status, 
+        lr.admin_comments, lr.created_at, lr.updated_at,
         u.email, ep.first_name, ep.last_name
        FROM leave_requests lr
        JOIN users u ON lr.user_id = u.id
@@ -112,8 +122,8 @@ router.get('/all', authMiddleware, roleMiddleware(['ADMIN']), async (req, res) =
   try {
     const result = await pool.query(
       `SELECT 
-        lr.id, lr.user_id, lr.start_date, lr.end_date, lr.reason, lr.status, 
-        lr.created_at, lr.updated_at,
+        lr.id, lr.user_id, lr.leave_type, lr.start_date, lr.end_date, lr.reason, lr.status, 
+        lr.admin_comments, lr.created_at, lr.updated_at,
         u.email, ep.first_name, ep.last_name
        FROM leave_requests lr
        JOIN users u ON lr.user_id = u.id
@@ -138,6 +148,7 @@ router.get('/all', authMiddleware, roleMiddleware(['ADMIN']), async (req, res) =
 router.put('/:id/approve', authMiddleware, roleMiddleware(['ADMIN']), async (req, res) => {
   try {
     const { id } = req.params;
+    const { admin_comments } = req.body;
 
     // Check if leave request exists and is pending
     const checkResult = await pool.query(
@@ -163,13 +174,13 @@ router.put('/:id/approve', authMiddleware, roleMiddleware(['ADMIN']), async (req
       });
     }
 
-    // Update status to APPROVED
+    // Update status to APPROVED with optional admin comments
     const result = await pool.query(
       `UPDATE leave_requests 
-       SET status = 'APPROVED', updated_at = NOW()
+       SET status = 'APPROVED', admin_comments = $2, updated_at = NOW()
        WHERE id = $1
-       RETURNING id, user_id, start_date, end_date, reason, status, created_at, updated_at`,
-      [id]
+       RETURNING id, user_id, leave_type, start_date, end_date, reason, status, admin_comments, created_at, updated_at`,
+      [id, admin_comments || null]
     );
 
     res.json(result.rows[0]);
@@ -189,6 +200,7 @@ router.put('/:id/approve', authMiddleware, roleMiddleware(['ADMIN']), async (req
 router.put('/:id/reject', authMiddleware, roleMiddleware(['ADMIN']), async (req, res) => {
   try {
     const { id } = req.params;
+    const { admin_comments } = req.body;
 
     // Check if leave request exists and is pending
     const checkResult = await pool.query(
@@ -214,13 +226,13 @@ router.put('/:id/reject', authMiddleware, roleMiddleware(['ADMIN']), async (req,
       });
     }
 
-    // Update status to REJECTED
+    // Update status to REJECTED with optional admin comments
     const result = await pool.query(
       `UPDATE leave_requests 
-       SET status = 'REJECTED', updated_at = NOW()
+       SET status = 'REJECTED', admin_comments = $2, updated_at = NOW()
        WHERE id = $1
-       RETURNING id, user_id, start_date, end_date, reason, status, created_at, updated_at`,
-      [id]
+       RETURNING id, user_id, leave_type, start_date, end_date, reason, status, admin_comments, created_at, updated_at`,
+      [id, admin_comments || null]
     );
 
     res.json(result.rows[0]);
