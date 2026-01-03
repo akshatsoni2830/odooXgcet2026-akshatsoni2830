@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/database');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -86,10 +87,15 @@ router.post('/logout', (req, res) => {
   res.json({ message: 'Logout successful' });
 });
 
-// GET /api/auth/me (requires auth middleware - will be added later)
-router.get('/me', (req, res) => {
-  // This will be implemented after authMiddleware is created
-  res.status(501).json({ message: 'Not implemented yet' });
+// GET /api/auth/me
+router.get('/me', authMiddleware, (req, res) => {
+  res.json({
+    user: {
+      id: req.user.id,
+      email: req.user.email,
+      role: req.user.role
+    }
+  });
 });
 
 module.exports = router;
