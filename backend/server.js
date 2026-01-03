@@ -11,12 +11,14 @@ app.use(express.json());
 
 // Routes
 const authRoutes = require('./routes/auth');
+const companyRoutes = require('./routes/company');
 const employeeRoutes = require('./routes/employees');
 const attendanceRoutes = require('./routes/attendance');
 const leaveRoutes = require('./routes/leave');
 const payrollRoutes = require('./routes/payroll');
 
 app.use('/api/auth', authRoutes);
+app.use('/api/company', companyRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/leave', leaveRoutes);

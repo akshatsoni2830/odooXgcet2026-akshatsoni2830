@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const pool = require('../config/database');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
+const { generateLoginId, generatePassword } = require('../utils/loginIdGenerator');
 
 const router = express.Router();
 
@@ -109,15 +110,15 @@ router.post('/', authMiddleware, roleMiddleware(['ADMIN']), async (req, res) => 
   const client = await pool.connect();
   
   try {
-    const { email, password, first_name, last_name, phone, department, position, hire_date } = req.body;
+    const { email, first_name, last_name, phone, mobile, department, position, manager, location, hire_date } = req.body;
 
     // Validate required fields
-    if (!email || !password || !first_name || !last_name) {
+    if (!email || !first_name || !last_name) {
       return res.status(400).json({
         error: {
-          message: 'Email, password, first name, and last name are required',
+          message: 'Email, first name, and last name are required',
           code: 'MISSING_REQUIRED_FIELDS',
-          details: { required: ['email', 'password', 'first_name', 'last_name'] }
+          details: { required: ['email', 'first_name', 'last_name'] }
         }
       });
     }
@@ -135,25 +136,27 @@ router.post('/', authMiddleware, roleMiddleware(['ADMIN']), async (req, res) => 
 
     await client.query('BEGIN');
 
-    // Hash password
-    const password_hash = await bcrypt.hash(password, 10);
+    // Generate login_id and password
+    const login_id = await generateLoginId(first_name, last_name);
+    const generated_password = generatePassword();
+    const password_hash = await bcrypt.hash(generated_password, 10);
 
     // Create user
     const userResult = await client.query(
-      `INSERT INTO users (email, password_hash, role) 
-       VALUES ($1, $2, 'EMPLOYEE') 
-       RETURNING id, email, role, created_at`,
-      [email, password_hash]
+      `INSERT INTO users (email, login_id, password_hash, password_change_required, role) 
+       VALUES ($1, $2, $3, true, 'EMPLOYEE') 
+       RETURNING id, email, login_id, role, password_change_required, created_at`,
+      [email, login_id, password_hash]
     );
 
     const user = userResult.rows[0];
 
     // Create employee profile
     const profileResult = await client.query(
-      `INSERT INTO employee_profiles (user_id, first_name, last_name, phone, department, position, hire_date)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO employee_profiles (user_id, first_name, last_name, phone, mobile, department, position, manager, location, hire_date)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING *`,
-      [user.id, first_name, last_name, phone || null, department || null, position || null, hire_date || null]
+      [user.id, first_name, last_name, phone || null, mobile || null, department || null, position || null, manager || null, location || null, hire_date || null]
     );
 
     await client.query('COMMIT');
@@ -161,7 +164,10 @@ router.post('/', authMiddleware, roleMiddleware(['ADMIN']), async (req, res) => 
     res.status(201).json({
       id: user.id,
       email: user.email,
+      login_id: user.login_id,
+      generated_password: generated_password,
       role: user.role,
+      password_change_required: user.password_change_required,
       ...profileResult.rows[0]
     });
 
@@ -171,8 +177,8 @@ router.post('/', authMiddleware, roleMiddleware(['ADMIN']), async (req, res) => 
     if (error.code === '23505') { // Unique violation
       return res.status(409).json({
         error: {
-          message: 'Email already exists',
-          code: 'DUPLICATE_EMAIL'
+          message: 'Email or login_id already exists',
+          code: 'DUPLICATE_ENTRY'
         }
       });
     }
