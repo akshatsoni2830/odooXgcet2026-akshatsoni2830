@@ -4,7 +4,8 @@ import { AuthContext } from '../context/AuthContext';
 import Layout from './Layout';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const { user, loading, isAdmin } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
+  const isAdmin = user?.role === 'ADMIN';
 
   if (loading) {
     return (
@@ -18,7 +19,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (adminOnly && !isAdmin()) {
+  if (adminOnly && !isAdmin) {
     return <Navigate to="/dashboard" replace />;
   }
 
