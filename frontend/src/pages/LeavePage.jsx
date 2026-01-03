@@ -6,6 +6,7 @@ const LeavePage = () => {
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
+    leave_type: '',
     start_date: '',
     end_date: '',
     reason: '',
@@ -46,7 +47,7 @@ const LeavePage = () => {
     try {
       await axios.post('/api/leave/request', formData);
       setMessage('Leave request submitted successfully!');
-      setFormData({ start_date: '', end_date: '', reason: '' });
+      setFormData({ leave_type: '', start_date: '', end_date: '', reason: '' });
       setShowForm(false);
       fetchLeaveRequests();
     } catch (err) {
@@ -101,6 +102,24 @@ const LeavePage = () => {
           <div className="bg-white rounded-lg shadow p-6 mb-6">
             <h2 className="text-xl font-semibold mb-4">New Leave Request</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Leave Type *
+                </label>
+                <select
+                  name="leave_type"
+                  value={formData.leave_type}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select leave type</option>
+                  <option value="PAID">Paid Leave</option>
+                  <option value="SICK">Sick Leave</option>
+                  <option value="UNPAID">Unpaid Leave</option>
+                </select>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -167,23 +186,25 @@ const LeavePage = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Leave Type</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Start Date</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">End Date</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Requested On</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Admin Comments</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {leaveRequests.length === 0 ? (
                       <tr>
-                        <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                        <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                           No leave requests found
                         </td>
                       </tr>
                     ) : (
                       leaveRequests.map((request) => (
                         <tr key={request.id}>
+                          <td className="px-6 py-4 whitespace-nowrap">{request.leave_type}</td>
                           <td className="px-6 py-4 whitespace-nowrap">{formatDate(request.start_date)}</td>
                           <td className="px-6 py-4 whitespace-nowrap">{formatDate(request.end_date)}</td>
                           <td className="px-6 py-4">{request.reason || '-'}</td>
@@ -192,7 +213,7 @@ const LeavePage = () => {
                               {request.status}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">{formatDate(request.created_at)}</td>
+                          <td className="px-6 py-4">{request.admin_comments || '-'}</td>
                         </tr>
                       ))
                     )}

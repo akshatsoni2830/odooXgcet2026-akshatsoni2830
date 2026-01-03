@@ -8,6 +8,10 @@ const AdminLeavePage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [adminComments, setAdminComments] = useState('');
+  const [showCommentsModal, setShowCommentsModal] = useState(false);
+  const [actionType, setActionType] = useState(''); // 'approve' or 'reject'
 
   useEffect(() => {
     fetchLeaveRequests();
@@ -28,30 +32,35 @@ const AdminLeavePage = () => {
   };
 
   const handleApprove = async (id) => {
-    setError('');
-    setMessage('');
-    try {
-      await axios.put(`/api/leave/${id}/approve`);
-      setMessage('Leave request approved successfully!');
-      fetchLeaveRequests();
-    } catch (err) {
-      setError(err.response?.data?.error?.message || 'Failed to approve leave request');
-    }
+    setSelectedRequest(id);
+    setActionType('approve');
+    setAdminComments('');
+    setShowCommentsModal(true);
   };
 
   const handleReject = async (id) => {
-    if (!window.confirm('Are you sure you want to reject this leave request?')) {
-      return;
-    }
+    setSelectedRequest(id);
+    setActionType('reject');
+    setAdminComments('');
+    setShowCommentsModal(true);
+  };
 
+  const confirmAction = async () => {
     setError('');
     setMessage('');
     try {
-      await axios.put(`/api/leave/${id}/reject`);
-      setMessage('Leave request rejected successfully!');
+      const endpoint = actionType === 'approve' 
+        ? `/api/leave/${selectedRequest}/approve`
+        : `/api/leave/${selectedRequest}/reject`;
+      
+      await axios.put(endpoint, { admin_comments: adminComments });
+      setMessage(`Leave request ${actionType}d successfully!`);
+      setShowCommentsModal(false);
+      setSelectedRequest(null);
+      setAdminComments('');
       fetchLeaveRequests();
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Failed to reject leave request');
+      setError(err.response?.data?.error?.message || `Failed to ${actionType} leave request`);
     }
   };
 
@@ -111,6 +120,7 @@ const AdminLeavePage = () => {
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Leave Type</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Start Date</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">End Date</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
@@ -121,7 +131,7 @@ const AdminLeavePage = () => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {leaveRequests.length === 0 ? (
                       <tr>
-                        <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                        <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
                           No leave requests found
                         </td>
                       </tr>
@@ -134,6 +144,7 @@ const AdminLeavePage = () => {
                               <div className="text-sm text-gray-500">{request.email}</div>
                             </div>
                           </td>
+                          <td className="px-6 py-4 whitespace-nowrap">{request.leave_type}</td>
                           <td className="px-6 py-4 whitespace-nowrap">{formatDate(request.start_date)}</td>
                           <td className="px-6 py-4 whitespace-nowrap">{formatDate(request.end_date)}</td>
                           <td className="px-6 py-4">{request.reason || '-'}</td>
@@ -172,6 +183,51 @@ const AdminLeavePage = () => {
             )}
           </div>
         </div>
+
+        {/* Comments Modal */}
+        {showCommentsModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <h3 className="text-lg font-semibold mb-4">
+                {actionType === 'approve' ? 'Approve' : 'Reject'} Leave Request
+              </h3>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Comments (Optional)
+                </label>
+                <textarea
+                  value={adminComments}
+                  onChange={(e) => setAdminComments(e.target.value)}
+                  rows="4"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Add comments for the employee..."
+                />
+              </div>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => {
+                    setShowCommentsModal(false);
+                    setSelectedRequest(null);
+                    setAdminComments('');
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmAction}
+                  className={`px-4 py-2 rounded-md text-white ${
+                    actionType === 'approve'
+                      ? 'bg-green-600 hover:bg-green-700'
+                      : 'bg-red-600 hover:bg-red-700'
+                  }`}
+                >
+                  Confirm {actionType === 'approve' ? 'Approval' : 'Rejection'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
