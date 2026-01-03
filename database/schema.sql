@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS leave_requests CASCADE;
 DROP TABLE IF EXISTS attendance CASCADE;
 DROP TABLE IF EXISTS employee_profiles CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS company CASCADE;
 DROP TYPE IF EXISTS user_role CASCADE;
 DROP TYPE IF EXISTS leave_status CASCADE;
 
@@ -17,11 +18,23 @@ DROP TYPE IF EXISTS leave_status CASCADE;
 CREATE TYPE user_role AS ENUM ('ADMIN', 'EMPLOYEE');
 CREATE TYPE leave_status AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
+-- Company table
+CREATE TABLE company (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    code VARCHAR(10) UNIQUE NOT NULL,
+    logo_url TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
 -- Users table
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) UNIQUE NOT NULL,
+    login_id VARCHAR(50) UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
+    password_change_required BOOLEAN DEFAULT FALSE,
     role user_role NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
@@ -34,9 +47,23 @@ CREATE TABLE employee_profiles (
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     phone VARCHAR(20),
+    mobile VARCHAR(20),
     department VARCHAR(100),
     position VARCHAR(100),
+    manager VARCHAR(100),
+    location VARCHAR(100),
+    about TEXT,
+    interests TEXT,
+    skills TEXT,
+    certifications TEXT,
+    bank_name VARCHAR(100),
+    bank_account VARCHAR(50),
+    bank_ifsc VARCHAR(20),
+    pan VARCHAR(20),
+    uan VARCHAR(20),
+    emp_code VARCHAR(50),
     hire_date DATE,
+    profile_image_url TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -72,6 +99,17 @@ CREATE TABLE payroll (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     month INTEGER NOT NULL CHECK (month BETWEEN 1 AND 12),
     year INTEGER NOT NULL,
+    monthly_wage DECIMAL(10, 2) NOT NULL,
+    yearly_wage DECIMAL(10, 2) NOT NULL,
+    basic DECIMAL(10, 2) NOT NULL,
+    hra DECIMAL(10, 2) DEFAULT 0,
+    standard_allowance DECIMAL(10, 2) DEFAULT 0,
+    performance_bonus DECIMAL(10, 2) DEFAULT 0,
+    lta DECIMAL(10, 2) DEFAULT 0,
+    fixed_allowance DECIMAL(10, 2) DEFAULT 0,
+    pf_employee DECIMAL(10, 2) DEFAULT 0,
+    pf_employer DECIMAL(10, 2) DEFAULT 0,
+    professional_tax DECIMAL(10, 2) DEFAULT 0,
     base_salary DECIMAL(10, 2) NOT NULL,
     deductions DECIMAL(10, 2) DEFAULT 0,
     net_salary DECIMAL(10, 2) NOT NULL,
@@ -81,7 +119,9 @@ CREATE TABLE payroll (
 );
 
 -- Create indexes for better query performance
+CREATE INDEX idx_company_code ON company(code);
 CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_login_id ON users(login_id);
 CREATE INDEX idx_users_role ON users(role);
 CREATE INDEX idx_employee_profiles_user_id ON employee_profiles(user_id);
 CREATE INDEX idx_attendance_user_id ON attendance(user_id);
@@ -101,6 +141,9 @@ END;
 $$ language 'plpgsql';
 
 -- Apply updated_at triggers
+CREATE TRIGGER update_company_updated_at BEFORE UPDATE ON company
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
