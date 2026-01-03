@@ -29,8 +29,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (email, password) => {
-    const response = await axios.post('/api/auth/login', { email, password });
+  const login = async (identifier, password) => {
+    const response = await axios.post('/api/auth/login', { identifier, password });
     const { token, user } = response.data;
     
     localStorage.setItem('token', token);
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     setUser(user);
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     
-    return user;
+    return response.data;
   };
 
   const logout = () => {
