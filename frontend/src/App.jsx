@@ -6,9 +6,10 @@ import SignupPage from './pages/SignupPage';
 import LoginPage from './pages/LoginPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import Dashboard from './pages/Dashboard';
-import EmployeeList from './pages/EmployeeList';
+import EmployeeListCards from './pages/EmployeeListCards';
 import EmployeeForm from './pages/EmployeeForm';
 import EmployeeProfile from './pages/EmployeeProfile';
+import EmployeeProfileTabs from './pages/EmployeeProfileTabs';
 import AttendancePage from './pages/AttendancePage';
 import LeavePage from './pages/LeavePage';
 import AdminLeavePage from './pages/AdminLeavePage';
@@ -88,7 +89,15 @@ function App() {
             path="/employees"
             element={
               <ProtectedRoute adminOnly>
-                <EmployeeList />
+                <EmployeeListCards />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/employees/profile/:id"
+            element={
+              <ProtectedRoute adminOnly>
+                <EmployeeProfile />
               </ProtectedRoute>
             }
           />
