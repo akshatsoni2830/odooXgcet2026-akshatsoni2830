@@ -6,7 +6,8 @@ import { User, Clock, Calendar, DollarSign, CheckCircle, Users } from 'lucide-re
 import axios from 'axios';
 
 const Dashboard = () => {
-  const { user, isAdmin } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
+  const isAdmin = user?.role === 'ADMIN';
   const [stats, setStats] = useState({
     totalEmployees: 0,
     presentToday: 0,
@@ -25,7 +26,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (user) {
-      if (isAdmin()) {
+      if (isAdmin) {
         fetchAdminStats();
       } else {
         fetchEmployeeData();
@@ -123,7 +124,7 @@ const Dashboard = () => {
     );
   }
 
-  if (isAdmin()) {
+  if (isAdmin) {
     return (
       <div className="space-y-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
