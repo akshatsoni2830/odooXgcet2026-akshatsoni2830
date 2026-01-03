@@ -6,6 +6,8 @@ import Dashboard from './pages/Dashboard';
 import EmployeeList from './pages/EmployeeList';
 import EmployeeForm from './pages/EmployeeForm';
 import AttendancePage from './pages/AttendancePage';
+import LeavePage from './pages/LeavePage';
+import AdminLeavePage from './pages/AdminLeavePage';
 
 // Placeholder components (will be implemented in next steps)
 const ComingSoon = ({ title }) => (
@@ -54,7 +56,7 @@ function App() {
             path="/leave"
             element={
               <ProtectedRoute>
-                <ComingSoon title="Leave" />
+                <LeavePage />
               </ProtectedRoute>
             }
           />
@@ -104,7 +106,7 @@ function App() {
             path="/admin/leave"
             element={
               <ProtectedRoute adminOnly>
-                <ComingSoon title="Admin Leave" />
+                <AdminLeavePage />
               </ProtectedRoute>
             }
           />
