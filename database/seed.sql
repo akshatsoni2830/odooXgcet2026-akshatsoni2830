@@ -6,7 +6,7 @@
 
 -- Insert Admin User
 INSERT INTO users (email, password_hash, role) VALUES
-('admin@dayflow.com', '$2b$10$rKZvVqZ5YJ5mXqZ5YJ5mXeO5YJ5mXqZ5YJ5mXqZ5YJ5mXqZ5YJ5mX', 'ADMIN');
+('admin@dayflow.com', '$2b$10$U4sh/vv2xOiC9iAbLtiAUOcFsvWlWpKN0pi1FLb3LjYLXFMPf8R2S', 'ADMIN');
 
 -- Get admin user_id for reference
 DO $$
@@ -22,9 +22,9 @@ END $$;
 
 -- Insert Sample Employees
 INSERT INTO users (email, password_hash, role) VALUES
-('john.doe@dayflow.com', '$2b$10$rKZvVqZ5YJ5mXqZ5YJ5mXeO5YJ5mXqZ5YJ5mXqZ5YJ5mXqZ5YJ5mX', 'EMPLOYEE'),
-('jane.smith@dayflow.com', '$2b$10$rKZvVqZ5YJ5mXqZ5YJ5mXeO5YJ5mXqZ5YJ5mXqZ5YJ5mXqZ5YJ5mX', 'EMPLOYEE'),
-('bob.johnson@dayflow.com', '$2b$10$rKZvVqZ5YJ5mXqZ5YJ5mXeO5YJ5mXqZ5YJ5mXqZ5YJ5mXqZ5YJ5mX', 'EMPLOYEE');
+('john.doe@dayflow.com', '$2b$10$U4sh/vv2xOiC9iAbLtiAUOcFsvWlWpKN0pi1FLb3LjYLXFMPf8R2S', 'EMPLOYEE'),
+('jane.smith@dayflow.com', '$2b$10$U4sh/vv2xOiC9iAbLtiAUOcFsvWlWpKN0pi1FLb3LjYLXFMPf8R2S', 'EMPLOYEE'),
+('bob.johnson@dayflow.com', '$2b$10$U4sh/vv2xOiC9iAbLtiAUOcFsvWlWpKN0pi1FLb3LjYLXFMPf8R2S', 'EMPLOYEE');
 
 -- Insert Employee Profiles
 DO $$
