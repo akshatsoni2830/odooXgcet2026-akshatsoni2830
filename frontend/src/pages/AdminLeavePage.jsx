@@ -53,14 +53,22 @@ const AdminLeavePage = () => {
         ? `/api/leave/${selectedRequest}/approve`
         : `/api/leave/${selectedRequest}/reject`;
       
-      await axios.put(endpoint, { admin_comments: adminComments });
+      console.log('Sending request to:', endpoint);
+      console.log('With data:', { admin_comments: adminComments });
+      
+      const response = await axios.put(endpoint, { admin_comments: adminComments });
+      console.log('Response:', response.data);
+      
       setMessage(`Leave request ${actionType}d successfully!`);
       setShowCommentsModal(false);
       setSelectedRequest(null);
       setAdminComments('');
       fetchLeaveRequests();
     } catch (err) {
+      console.error('Error approving/rejecting leave:', err);
+      console.error('Error response:', err.response?.data);
       setError(err.response?.data?.error?.message || `Failed to ${actionType} leave request`);
+      setShowCommentsModal(false);
     }
   };
 
