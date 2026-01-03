@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import EmployeeList from './pages/EmployeeList';
 import EmployeeForm from './pages/EmployeeForm';
+import AttendancePage from './pages/AttendancePage';
 
 // Placeholder components (will be implemented in next steps)
 const ComingSoon = ({ title }) => (
@@ -45,7 +46,7 @@ function App() {
             path="/attendance"
             element={
               <ProtectedRoute>
-                <ComingSoon title="Attendance" />
+                <AttendancePage />
               </ProtectedRoute>
             }
           />
