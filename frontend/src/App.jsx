@@ -5,9 +5,13 @@ import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import EmployeeList from './pages/EmployeeList';
 import EmployeeForm from './pages/EmployeeForm';
+import EmployeeProfile from './pages/EmployeeProfile';
 import AttendancePage from './pages/AttendancePage';
 import LeavePage from './pages/LeavePage';
 import AdminLeavePage from './pages/AdminLeavePage';
+import PayrollPage from './pages/PayrollPage';
+import AdminPayrollPage from './pages/AdminPayrollPage';
+import PayrollForm from './pages/PayrollForm';
 
 // Placeholder components (will be implemented in next steps)
 const ComingSoon = ({ title }) => (
@@ -40,7 +44,7 @@ function App() {
             path="/profile"
             element={
               <ProtectedRoute>
-                <ComingSoon title="My Profile" />
+                <EmployeeProfile />
               </ProtectedRoute>
             }
           />
@@ -64,7 +68,7 @@ function App() {
             path="/payroll"
             element={
               <ProtectedRoute>
-                <ComingSoon title="Payroll" />
+                <PayrollPage />
               </ProtectedRoute>
             }
           />
@@ -114,7 +118,23 @@ function App() {
             path="/admin/payroll"
             element={
               <ProtectedRoute adminOnly>
-                <ComingSoon title="Admin Payroll" />
+                <AdminPayrollPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/payroll/new"
+            element={
+              <ProtectedRoute adminOnly>
+                <PayrollForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/payroll/edit/:id"
+            element={
+              <ProtectedRoute adminOnly>
+                <PayrollForm />
               </ProtectedRoute>
             }
           />
