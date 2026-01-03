@@ -15,15 +15,15 @@ router.post('/login', async (req, res) => {
     if (!identifier || !password) {
       return res.status(400).json({
         error: {
-          message: 'Email/Login ID and password are required',
+          message: 'Email and password are required',
           code: 'MISSING_CREDENTIALS'
         }
       });
     }
 
-    // Find user by email or login_id
+    // Find user by email
     const result = await pool.query(
-      'SELECT id, email, login_id, password_hash, password_change_required, role FROM users WHERE email = $1 OR login_id = $1',
+      'SELECT id, email, login_id, password_hash, password_change_required, role FROM users WHERE email = $1',
       [identifier]
     );
 
@@ -70,7 +70,7 @@ router.post('/login', async (req, res) => {
         email: user.email,
         login_id: user.login_id,
         role: user.role,
-        password_change_required: user.password_change_required
+        password_change_required: user.password_change_required || false
       }
     });
 

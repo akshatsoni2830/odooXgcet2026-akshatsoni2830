@@ -1,43 +1,12 @@
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { Users, Clock, Calendar, DollarSign, ArrowRight } from 'lucide-react';
 
 const LandingPage = () => {
-  const [companyExists, setCompanyExists] = useState(false);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    checkCompany();
-  }, []);
-
-  const checkCompany = async () => {
-    try {
-      const response = await axios.get('/api/company/exists');
-      setCompanyExists(response.data.exists);
-    } catch (err) {
-      console.error('Company check error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleGetStarted = () => {
-    if (companyExists) {
-      navigate('/login');
-    } else {
-      navigate('/signup');
-    }
+    navigate('/login');
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-gray-600">Loading...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
@@ -54,7 +23,7 @@ const LandingPage = () => {
             onClick={handleGetStarted}
             className="inline-flex items-center px-8 py-4 bg-purple-600 text-white text-lg font-semibold rounded-lg hover:bg-purple-700 transition-colors shadow-lg"
           >
-            {companyExists ? 'Sign In' : 'Get Started'}
+            Sign In
             <ArrowRight className="ml-2 w-5 h-5" />
           </button>
         </div>
@@ -119,7 +88,7 @@ const LandingPage = () => {
             onClick={handleGetStarted}
             className="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-purple-50 transition-colors"
           >
-            {companyExists ? 'Sign In Now' : 'Start Your Journey'}
+            Sign In Now
           </button>
         </div>
       </div>

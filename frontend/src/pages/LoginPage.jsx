@@ -42,7 +42,7 @@ const LoginPage = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="identifier" className="block text-sm font-medium text-gray-700 mb-1">
-              Email or Login ID
+              Email
             </label>
             <input
               id="identifier"
@@ -51,7 +51,7 @@ const LoginPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your email or login ID"
+              placeholder="Enter your email"
             />
           </div>
 
