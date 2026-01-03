@@ -22,7 +22,7 @@ const Button = ({
         classes += ' btn-outline';
         break;
       case 'danger':
-        classes += ' btn-primary';
+        classes += ' btn-primary'; // Using primary style for now
         break;
       case 'ghost':
         classes += ' btn-outline';

@@ -1,8 +1,6 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import FormInput from '../components/ui/FormInput';
-import Button from '../components/ui/Button';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -19,8 +17,14 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      await login(email, password);
-      navigate('/dashboard');
+      const response = await login(email, password);
+      
+      // Check if password change is required
+      if (response.user.password_change_required) {
+        navigate('/change-password');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError(err.response?.data?.error?.message || 'Login failed. Please try again.');
     } finally {
@@ -29,59 +33,57 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-4 px-4">
-      <div className="w-full" style={{ maxWidth: '28rem' }}>
-        <div className="space-y-6">
-          <div className="text-center">
-            <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center" style={{ margin: '0 auto' }}>
-              <span className="text-white font-bold text-xl">D</span>
-            </div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Sign in to Dayflow
-            </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              HR Management System
-            </p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
+          Dayflow HRMS
+        </h1>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="identifier" className="block text-sm font-medium text-gray-700 mb-1">
+              Email or Login ID
+            </label>
+            <input
+              id="identifier"
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your email or login ID"
+            />
           </div>
-          
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <FormInput
-                label="Email"
-                name="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-              />
-              
-              <FormInput
-                label="Password"
-                name="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-              />
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your password"
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+              {error}
             </div>
+          )}
 
-            {error && (
-              <div className="alert alert-error">
-                {error}
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              loading={loading}
-              className="w-full btn-lg"
-            >
-              Sign In
-            </Button>
-          </form>
-        </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
       </div>
     </div>
   );
