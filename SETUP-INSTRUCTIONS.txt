@@ -1,0 +1,72 @@
+DAYFLOW HRMS SETUP INSTRUCTIONS
+================================
+
+SYSTEM STATUS:
+✓ Database schema updated with all required fields
+✓ Backend APIs implemented (company setup, auth, employees, etc.)
+✓ Frontend updated with signup, login, card-based employee list
+✓ All branches merged to main
+
+NEXT STEPS TO RUN THE SYSTEM:
+==============================
+
+1. SETUP DATABASE:
+   Open PostgreSQL command line (psql) and run:
+   
+   CREATE DATABASE dayflow_hrms;
+   \c dayflow_hrms
+   \i A:/projects/odooXgcet2026-akshatsoni2830/database/schema.sql
+   \i A:/projects/odooXgcet2026-akshatsoni2830/database/seed.sql
+
+   OR use the batch file:
+   cd database
+   setup.bat
+
+2. BACKEND IS RUNNING:
+   - Port: 5000
+   - Status: Running (ProcessId: 15)
+   - Check: http://localhost:5000/health
+
+3. FRONTEND IS RUNNING:
+   - Port: 3001
+   - Status: Running (ProcessId: 14)
+   - Access: http://localhost:3001
+
+4. FIRST TIME SETUP:
+   - Visit: http://localhost:3001
+   - Click "Get Started" (will redirect to signup)
+   - Fill company details and admin account
+   - After setup, login with admin credentials
+
+5. CREATE EMPLOYEES:
+   - Login as admin
+   - Go to Employees page
+   - Click "NEW" button
+   - System auto-generates login_id and password
+   - Share credentials with employee
+
+CURRENT ISSUES:
+===============
+- Database tables not created yet
+- Need to run schema.sql manually
+
+FEATURES IMPLEMENTED:
+=====================
+✓ One-time company signup
+✓ Login with email or login_id
+✓ Auto login_id generation (format: [CompanyCode][FirstInitial][LastInitial][Year][Serial])
+✓ Auto password generation for employees
+✓ First-login password change enforcement
+✓ Card-based employee list view
+✓ Tabbed profile view (Resume/Private/Salary/Security)
+✓ Role-based UI visibility
+✓ Extended employee fields
+✓ Salary components in payroll
+
+NEXT DEVELOPMENT TASKS:
+=======================
+- Implement attendance views (admin all employees, employee daily/weekly)
+- Hide salary info from employee payroll view
+- Update employee form with all new fields
+- Add profile image upload
+- Implement search functionality in employee list
